@@ -1,13 +1,8 @@
-### Primer rest server
+### dOCUMENTACIÓN DE SERVICIOS
 
-GET: https://thawing-shore-34118.herokuapp.com/usuario
+https://documenter.getpostman.com/view/4694336/SW7XbVCK?version=latest
 
-POST: https://thawing-shore-34118.herokuapp.com/usuario
+URL PROD: https://thawing-shore-34118.herokuapp.com
 
-Required Params:
+URL LOCAL: http://localhost:<aca-va-el-puerto>
 
-nombre
-
-PUT: https://thawing-shore-34118.herokuapp.com/usuario/1561516516515
-
-DELETE: https://thawing-shore-34118.herokuapp.com/usuario
