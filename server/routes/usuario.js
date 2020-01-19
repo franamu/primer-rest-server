@@ -1,15 +1,16 @@
-const express = require('express');
+const express = require("express");
 
-const bcrypt = require('bcrypt');
-const _ = require('underscore');
+const bcrypt = require("bcrypt");
+const _ = require("underscore");
 
 const app = express();
-const Usuario = require('../models/usuario');
-const { verificarToken, verificarAdmin_Rol } = require('../middlewares/autentificacion');
+const Usuario = require("../models/usuario");
+const {
+  verificarToken,
+  verificarAdmin_Rol
+} = require("../middlewares/autentificacion");
 
-app.get('/usuario', verificarToken ,(req, res) => {
-  
-
+app.get("/usuario", verificarToken, (req, res) => {
   let desde = req.query.desde || 0;
   desde = Number(desde);
 
@@ -18,32 +19,29 @@ app.get('/usuario', verificarToken ,(req, res) => {
   //skip salta los primeros 5 registros
   //limit determina cuantos registros va a agarrar
   //exec ejecuta la consulta
-  Usuario.find({}, 'nombre email role estado google img')
-          .skip(desde)
-          .limit(limite)
-          .exec( (err, usuarios) => {
-            if (err) {
-              return res.status(400).json({
-                ok: false,
-                err
-              })
-            }
+  Usuario.find({}, "nombre email role estado google img")
+    .skip(desde)
+    .limit(limite)
+    .exec((err, usuarios) => {
+      if (err) {
+        return res.status(400).json({
+          ok: false,
+          err
+        });
+      }
 
-            Usuario.count({}, (err, conteo) => {
-
-              res.json({
-                ok: true,
-                usuarios,
-                cuantos: conteo
-              });
-
-            });
-          });
+      Usuario.count({}, (err, conteo) => {
+        res.json({
+          ok: true,
+          usuarios,
+          cuantos: conteo
+        });
+      });
+    });
 });
 
-app.post('/usuario', [verificarToken, verificarAdmin_Rol], function (req, res) {
-
-	let body = req.body
+app.post("/usuario", [verificarToken, verificarAdmin_Rol], function(req, res) {
+  let body = req.body;
 
   let usuario = new Usuario({
     nombre: body.nombre,
@@ -52,13 +50,12 @@ app.post('/usuario', [verificarToken, verificarAdmin_Rol], function (req, res) {
     role: body.role
   });
 
-  usuario.save( (err, usuarioDB) => {
-
+  usuario.save((err, usuarioDB) => {
     if (err) {
       return res.status(400).json({
         ok: false,
         err
-      })
+      });
     }
 
     //usuarioDB.password = null;
@@ -66,56 +63,62 @@ app.post('/usuario', [verificarToken, verificarAdmin_Rol], function (req, res) {
     res.json({
       ok: true,
       usuario: usuarioDB
-    })
-
+    });
   });
-
 });
 
-app.put('/usuario/:id', [verificarToken, verificarAdmin_Rol], function (req, res) {
-	let id = req.params.id;
-  let body = _.pick(req.body, ['nombre', 'email', 'img', 'role', 'estado']);
+app.put("/usuario/:id", [verificarToken, verificarAdmin_Rol], function(
+  req,
+  res
+) {
+  let id = req.params.id;
+  let body = _.pick(req.body, ["nombre", "email", "img", "role", "estado"]);
 
-  Usuario.findByIdAndUpdate(id, body, {new: true, runValidators: true}, (err, usuarioDB) => {
+  Usuario.findByIdAndUpdate(
+    id,
+    body,
+    { new: true, runValidators: true },
+    (err, usuarioDB) => {
+      if (err) {
+        return res.status(400).json({
+          ok: false,
+          err
+        });
+      }
 
-    if (err) {
-      return res.status(400).json({
-        ok: false,
-        err
-      })
+      res.json({
+        ok: true,
+        usuario: usuarioDB
+      });
     }
-
-    res.json({
-      ok: true,
-      usuario: usuarioDB
-    })
-  })
+  );
 
   /*res.json({
   	id
   })*/
 });
 
-app.delete('/usuario/:id', [verificarToken, verificarAdmin_Rol], function (req, res) {
-  
+app.delete("/usuario/:id", [verificarToken, verificarAdmin_Rol], function(
+  req,
+  res
+) {
   let id = req.params.id;
 
   Usuario.findByIdAndRemove(id, (err, usuarioBorrado) => {
-
     if (err) {
       return res.status(400).json({
         ok: false,
         err
-      })
+      });
     }
 
     if (!usuarioBorrado) {
       return res.status(400).json({
         ok: false,
         err: {
-          message: 'Usuario no encontrado'
+          message: "Usuario no encontrado"
         }
-      })
+      });
     }
 
     res.json({
@@ -123,7 +126,6 @@ app.delete('/usuario/:id', [verificarToken, verificarAdmin_Rol], function (req, 
       usuario: usuarioBorrado
     });
   });
-
 });
 
 module.exports = app;
