@@ -24,11 +24,7 @@ app.get("/usuario", verificarToken, (req, res) => {
   //skip salta los primeros 5 registros
   //limit determina cuantos registros va a agarrar
   //exec ejecuta la consulta
-<<<<<<< HEAD
   Usuario.find({}, "nombre email role estado google img")
-=======
-  Usuario.find({ estado: true }, "nombre email role estado google img")
->>>>>>> 264632df7defac6712072735c42cae653471ebc3
     .skip(desde)
     .limit(limite)
     .exec((err, usuarios) => {
@@ -39,11 +35,7 @@ app.get("/usuario", verificarToken, (req, res) => {
         });
       }
 
-<<<<<<< HEAD
       Usuario.count({}, (err, conteo) => {
-=======
-      Usuario.count({ estado: true }, (err, conteo) => {
->>>>>>> 264632df7defac6712072735c42cae653471ebc3
         res.json({
           ok: true,
           usuarios,
@@ -105,13 +97,10 @@ app.put("/usuario/:id", [verificarToken, verificarAdmin_Rol], function(
       });
     }
   );
-<<<<<<< HEAD
 
   /*res.json({
   	id
   })*/
-=======
->>>>>>> 264632df7defac6712072735c42cae653471ebc3
 });
 
 app.delete("/usuario/:id", [verificarToken, verificarAdmin_Rol], function(
@@ -120,12 +109,7 @@ app.delete("/usuario/:id", [verificarToken, verificarAdmin_Rol], function(
 ) {
   let id = req.params.id;
 
-<<<<<<< HEAD
   Usuario.findByIdAndRemove(id, (err, usuarioBorrado) => {
-=======
-  // Eliminado físico
-  /*Usuario.findByIdAndRemove(id, (err, usuarioBorrado) => {
->>>>>>> 264632df7defac6712072735c42cae653471ebc3
     if (err) {
       return res.status(400).json({
         ok: false,
@@ -146,36 +130,7 @@ app.delete("/usuario/:id", [verificarToken, verificarAdmin_Rol], function(
       ok: true,
       usuario: usuarioBorrado
     });
-<<<<<<< HEAD
   });
-=======
-  });*/
-
-  // Eliminar registro cambiando estado
-  let cambiaEstado = {
-    estado: false
-  };
-
-  Usuario.findByIdAndUpdate(
-    id,
-    cambiaEstado,
-    { new: true },
-    (err, usuarioBorrado) => {
-      if (err) {
-        return res.status(400).json({
-          ok: false,
-          err
-        });
-      }
-
-      res.json({
-        ok: true,
-        usuarioBorrado,
-        message: "Usuario eliminado correctamente"
-      });
-    }
-  );
->>>>>>> 264632df7defac6712072735c42cae653471ebc3
 });
 
 module.exports = app;
