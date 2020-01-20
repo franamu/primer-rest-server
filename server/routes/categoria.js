@@ -7,14 +7,16 @@ const app = express();
 const Categoria = require("../models/categoria");
 
 // Servicio que se encarga de mostrar todas las categorias
-app.get("/categoria", (req, res) => {
+app.get("/categoria", verificarToken, (req, res) => {
   let desde = req.query.desde || 0;
   desde = Number(desde);
 
   let limite = req.query.limite || 5;
   limite = Number(limite);
 
-  Categoria.find({}, "descripcion usuario")
+  Categoria.find({})
+    .sort("descripcion")
+    .populate("usuario", "nombre email")
     .skip(desde)
     .limit(limite)
     .exec((err, categorias) => {
@@ -36,7 +38,7 @@ app.get("/categoria", (req, res) => {
 });
 
 // mostrar una categoria por id
-app.get("/categoria/:id", (req, res) => {
+app.get("/categoria/:id", verificarToken, (req, res) => {
   let id = req.params.id;
 
   Categoria.findById(id, "descripcion usuario").exec((err, categoriaDB) => {

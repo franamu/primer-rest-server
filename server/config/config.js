@@ -16,7 +16,7 @@ let urlDB;
 // 30 días
 // =============================
 
-process.env.CADUCIDAD_TOKEN = 60 * 60 * 24 * 30;
+process.env.CADUCIDAD_TOKEN = "48h";
 
 // =============================
 // Semilla de atentificación
