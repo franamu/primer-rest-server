@@ -18,6 +18,15 @@ app.post("/login", (req, res) => {
         err
       });
     }
+<<<<<<< HEAD
+
+    // Se valida si usuarioDB es nullo
+    if (!usuarioDB) {
+      return res.status(400).json({
+        ok: false,
+        err: {
+          message: "(Usuario) o contraseña incorrectos"
+=======
 
     // Se valida si usuarioDB es nullo
     if (!usuarioDB) {
@@ -29,6 +38,18 @@ app.post("/login", (req, res) => {
       });
     }
 
+    // Se valida que la contraseña sea igual. Si no es igual entra en el if
+    if (!bcrypt.compareSync(body.password, usuarioDB.password)) {
+      return res.status(400).json({
+        ok: false,
+        err: {
+          message: "Usuario o (contraseña) incorrectos"
+>>>>>>> 264632df7defac6712072735c42cae653471ebc3
+        }
+      });
+    }
+
+<<<<<<< HEAD
     // Se valida que la contraseña sea igual. Si no es igual entra en el if
     if (!bcrypt.compareSync(body.password, usuarioDB.password)) {
       return res.status(400).json({
@@ -54,6 +75,38 @@ app.post("/login", (req, res) => {
       usuario: usuarioDB,
       token
     });
+=======
+    // Generar token
+    let token = jwt.sign(
+      {
+        usuario: usuarioDB
+      },
+      process.env.SEMILLA,
+      { expiresIn: process.env.CADUCIDAD_TOKEN }
+    );
+
+    // Si el usuario existe y la contraseña es igual se devuelve el token
+    res.json({
+      ok: true,
+      usuario: usuarioDB,
+      token
+    });
+  });
+});
+
+app.post("/create", (req, res) => {
+  let { nombre, email, password1, password2 } = req.body;
+
+  // obtengo modelo del Usuario
+  let usuario = new Usuario();
+
+  usuario.nombre = body.nombre;
+  usuario.email = body.email;
+
+  res.json({
+    ok: true,
+    menssaje: body
+>>>>>>> 264632df7defac6712072735c42cae653471ebc3
   });
 });
 
