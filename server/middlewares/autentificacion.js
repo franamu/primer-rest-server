@@ -5,6 +5,7 @@ const jwt = require("jsonwebtoken");
 // ======================
 
 let verificarToken = (req, res, next) => {
+  // el get es por q traigo los headers
   let token = req.get("Authorization");
 
   jwt.verify(token, process.env.SEMILLA, (err, decoded) => {
