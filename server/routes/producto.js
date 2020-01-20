@@ -66,6 +66,46 @@ app.post("/producto", [verificarToken, verificarAdmin_Rol], (req, res) => {
   });
 });
 
+// actualizar un producto
+app.put("/producto/:id", [verificarToken, verificarAdmin_Rol], (req, res) => {
+  let id = req.params.id;
+  let body = req.body;
+
+  let productoEdit = {
+    nombre: body.nombre,
+    precioUni: body.precioUni,
+    descripcion: body.descripcion,
+    categoria: body.categoria,
+    usuario: body.usuario
+  };
+
+  Producto.findByIdAndUpdate(
+    id,
+    productoEdit,
+    { new: true, runValidators: true },
+    (err, productoDB) => {
+      if (err) {
+        return res.status(500).json({
+          ok: false,
+          err
+        });
+      }
+
+      if (!productoDB) {
+        return res.status(400).json({
+          ok: false,
+          err
+        });
+      }
+
+      res.json({
+        ok: true,
+        producto: productoDB
+      });
+    }
+  );
+});
+
 app.delete(
   "/producto/:id",
   [verificarToken, verificarAdmin_Rol],
