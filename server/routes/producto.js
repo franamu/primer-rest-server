@@ -38,6 +38,38 @@ app.get("/producto", verificarToken, (req, res) => {
     });
 });
 
+// Obtener un producto por id
+
+app.get("/producto/:id", verificarToken, (req, res) => {
+  let id = req.params.id;
+
+  Producto.findById(id)
+    .populate("usuario", "nombre email")
+    .populate("categoria", "nombre")
+    .exec((err, productoDb) => {
+      if (err) {
+        res.status(500).json({
+          ok: false,
+          err
+        });
+      }
+
+      if (!productoDb) {
+        res.status(400).json({
+          ok: false,
+          err: {
+            message: "No se encontró el producto"
+          }
+        });
+      }
+
+      res.json({
+        ok: true,
+        productos: productoDb
+      });
+    });
+});
+
 // crear un producto
 app.post("/producto", [verificarToken, verificarAdmin_Rol], (req, res) => {
   let body = req.body;
@@ -48,7 +80,7 @@ app.post("/producto", [verificarToken, verificarAdmin_Rol], (req, res) => {
     descripcion: body.descripcion,
     disponible: body.disponible,
     categoria: body.categoria,
-    usuario: body.usuario
+    usuario: req.usuario.id
   });
 
   producto.save((err, productoDB) => {
@@ -61,7 +93,7 @@ app.post("/producto", [verificarToken, verificarAdmin_Rol], (req, res) => {
 
     res.json({
       ok: true,
-      productoDB
+      producto: productoDB
     });
   });
 });
@@ -112,7 +144,8 @@ app.delete(
   (req, res) => {
     let id = req.params.id;
 
-    Producto.findByIdAndRemove(id, (err, productoDB) => {
+    // Eliminado físico
+    /*Producto.findByIdAndRemove(id, (err, productoDB) => {
       if (err) {
         return res.status(500).json({
           ok: false,
@@ -130,6 +163,39 @@ app.delete(
       res.json({
         ok: true,
         productoDB
+      });
+    });*/
+
+    Producto.findById(id, (err, productoDB) => {
+      if (err) {
+        return res.status(500).json({
+          ok: false,
+          err
+        });
+      }
+
+      if (!productoDB) {
+        return res.status(400).json({
+          ok: false,
+          err
+        });
+      }
+
+      productoDB.disponible = false;
+
+      productoDB.save((err, productoBorrado) => {
+        if (err) {
+          return res.status(500).json({
+            ok: false,
+            err
+          });
+        }
+
+        res.json({
+          ok: true,
+          producto: productoBorrado,
+          mensaje: "Producto borrado"
+        });
       });
     });
   }

@@ -120,7 +120,9 @@ app.put("/categoria/:id", verificarToken, (req, res) => {
       if (!categoriaDB) {
         return res.status(400).json({
           ok: false,
-          err
+          err: {
+            message: "No hay categorías"
+          }
         });
       }
 
