@@ -201,4 +201,27 @@ app.delete(
   }
 );
 
+// buscar productos
+app.get("/producto/buscar/:termino", verificarToken, (req, res) => {
+  let termino = req.params.termino;
+
+  let regex = new RegExp(termino, "i");
+
+  Producto.find({ nombre: regex })
+    .populate("categoria", "nombre")
+    .exec((err, productos) => {
+      if (err) {
+        res.status(500).json({
+          ok: false,
+          err
+        });
+      }
+
+      res.json({
+        ok: true,
+        productos
+      });
+    });
+});
+
 module.exports = app;
