@@ -6,6 +6,7 @@ const path = require("path");
 
 // modelos
 const Usuario = require("../models/usuario");
+const Productos = require("../models/producto");
 
 // opciones por defecto
 app.use(fileUpload({ useTempFiles: true }));
@@ -13,6 +14,7 @@ app.use(fileUpload({ useTempFiles: true }));
 app.put("/upload/:tipo/:id", function(req, res) {
   let tipo = req.params.tipo;
   let id = req.params.id;
+
   if (!req.files) {
     return res.status(400).json({
       ok: false,
@@ -64,8 +66,24 @@ app.put("/upload/:tipo/:id", function(req, res) {
       });
     }
 
-    // Imagen está cargada
-    imagenUsuario(id, res, nombreArchivo);
+    // Imagen está cargada: se pasa a actualizar base de datos
+    switch (tipo) {
+      case "usuarios":
+        imagenUsuario(id, res, nombreArchivo);
+        break;
+
+      case "productos":
+        imagenProducto(id, res, nombreArchivo);
+        break;
+
+      default:
+        return res.status(400).json({
+          ok: false,
+          err: {
+            message: "Tipo incorrecto en opciones del switch"
+          }
+        });
+    }
   });
 });
 
@@ -80,7 +98,7 @@ function imagenUsuario(id, res, nombreArchivo) {
     }
 
     if (!usuarioDB) {
-      borraArchivo(nombreArchivo, "usuario");
+      borraArchivo(nombreArchivo, "usuarios");
       return res.status(400).json({
         ok: false,
         err: {
@@ -89,7 +107,8 @@ function imagenUsuario(id, res, nombreArchivo) {
       });
     }
 
-    borraArchivo(usuarioDB.img, "usuario");
+    borraArchivo(usuarioDB.img, "usuarios");
+
     usuarioDB.img = nombreArchivo;
 
     usuarioDB.save((err, usuarioGuardado) => {
@@ -102,12 +121,41 @@ function imagenUsuario(id, res, nombreArchivo) {
   });
 }
 
-function imagenProducto() {}
+function imagenProducto(id, res, nombreArchivo) {
+  Productos.findById(id, (err, productoDB) => {
+    if (err) {
+      return res.status(500).json({
+        ok: false,
+        err
+      });
+    }
 
-function borraArchivo(nombreImagen, tipo) {
+    if (!productoDB) {
+      return res.status(400).json({
+        ok: false,
+        err: {
+          message: "Producto no encontrado"
+        }
+      });
+    }
+
+    borraArchivo(nombreArchivo, "productos");
+
+    productoDB.img = nombreArchivo;
+    productoDB.save((err, productoDB) => {
+      res.json({
+        ok: true,
+        producto: productoDB,
+        img: nombreArchivo
+      });
+    });
+  });
+}
+
+function borraArchivo(nombreArchivo, tipo) {
   let pathImagen = path.resolve(
     __dirname,
-    `../../uploads/${tipo}/${nombreImagen}`
+    `../../uploads/${tipo}/${nombreArchivo}`
   );
 
   if (fs.existsSync(pathImagen)) {
